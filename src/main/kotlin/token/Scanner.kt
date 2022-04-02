@@ -78,7 +78,7 @@ class Scanner(
                         }
                         sb.append(ch)
                     }
-                    '+', '-', '*', '/', '=' -> {
+                    '+', '-', '*', '/', '=', '<', '>' -> {
                         if (scanType != ScanType.Operator) {
                             saveToken()
                             scanType = ScanType.Operator

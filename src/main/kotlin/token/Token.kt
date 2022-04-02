@@ -46,7 +46,7 @@ sealed class Punctuation(val value: String) : AbstractToken() {
 
     companion object {
         private val all =
-            listOf(LBracket, RBracket, LRectBracket, RRectBracket, LCurlyBracket, RCurlyBracket, Semicolon)
+            listOf(LBracket, RBracket, LRectBracket, RRectBracket, LCurlyBracket, RCurlyBracket, Semicolon, Comma)
 
         fun lookup(punctuation: String) = all.firstOrNull { it.value == punctuation }
     }
@@ -58,6 +58,7 @@ sealed class Punctuation(val value: String) : AbstractToken() {
     object LCurlyBracket : Punctuation("{")
     object RCurlyBracket : Punctuation("}")
     object Semicolon : Punctuation(";")
+    object Comma : Punctuation(",")
 }
 
 @Suppress("ClassName")
@@ -90,10 +91,12 @@ sealed class Operator(val operator: String) : AbstractToken() {
     object Multiply : Operator("*")
     object Divide : Operator("/")
     object Assign : Operator("=")
+    object Greater : Operator(">")
+    object Lesser : Operator("<")
 
     companion object {
         // private val all = Operator::class.sealedSubclasses.map { it.objectInstance }
-        private val all = setOf(Plus, Minus, Multiply, Divide, Assign, PlusPlus, MinusMinus)
+        private val all = setOf(Plus, Minus, Multiply, Divide, Assign, PlusPlus, MinusMinus, Greater, Lesser)
 
         fun lookup(operator: String) = all.firstOrNull { it?.operator == operator }
     }
