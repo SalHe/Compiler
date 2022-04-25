@@ -31,10 +31,11 @@ class Scanner(
         val string = sb.toString()
         when (scanType) {
             ScanType.NoScanning -> {}
-            ScanType.Integer -> tokens.add(Literal.IntegerLiteral(string.toInt(), string))
+            ScanType.Integer -> tokens.add(Literal.IntegerLiteral(string))
             ScanType.String -> tokens.add(Literal.StringLiteral(string))
             ScanType.Word -> {
                 var token: Token? = PrimitiveType.lookup(string)
+                if (token == null) token = Keyword.lookup(string)
                 if (token == null) token = fetchIdentifier(string)
                 tokens.add(token)
             }
@@ -64,7 +65,8 @@ class Scanner(
                         }
                     }
                     in 'A'..'Z', in 'a'..'z' -> {
-                        if (scanType == ScanType.NoScanning) {
+                        if (scanType != ScanType.Word) {
+                            saveToken()
                             scanType = ScanType.Word
                             sb.clear()
                         }
@@ -73,12 +75,14 @@ class Scanner(
                     in '0'..'9' -> {
                         // 如果不是作为单词的一部分，当前也不是在扫描整数，则认为现在应该开始扫描整数
                         if (scanType != ScanType.Word && scanType != ScanType.Integer) {
+                            saveToken()
+
                             scanType = ScanType.Integer
                             sb.clear()
                         }
                         sb.append(ch)
                     }
-                    '+', '-', '*', '/', '=', '<', '>' -> {
+                    '+', '-', '*', '/', '=', '<', '>', '!' -> {
                         if (scanType != ScanType.Operator) {
                             saveToken()
                             scanType = ScanType.Operator

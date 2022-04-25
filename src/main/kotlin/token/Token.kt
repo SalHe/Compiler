@@ -13,6 +13,15 @@ abstract class AbstractToken : Token {
             return "<${tokenTypeDescription()}>"
         return "<${tokenTypeDescription()}, ${otherAttributes.joinToString()}>"
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other || this.toString() == other.toString()) return true
+        if (javaClass != other?.javaClass) return false
+        return true
+    }
+
+    override fun hashCode(): Int = toString().hashCode()
+
 }
 
 abstract class Literal : AbstractToken() {
@@ -24,7 +33,7 @@ abstract class Literal : AbstractToken() {
         override fun otherAttributes(): List<Any> = listOf(value as Any, "\"$rawString\"")
     }
 
-    class IntegerLiteral(value: Int, rawString: String) : NumberLiteral<Int>(value, rawString)
+    class IntegerLiteral(rawString: String) : NumberLiteral<Int>(rawString.toInt(), rawString)
 }
 
 class Identifier(val id: String) : AbstractToken() {
@@ -61,6 +70,25 @@ sealed class Punctuation(val value: String) : AbstractToken() {
     object Comma : Punctuation(",")
 }
 
+sealed class Keyword(val value: String) : AbstractToken() {
+    override fun otherAttributes(): List<Any> = listOf(value)
+
+    override fun tokenTypeDescription(): String = "Keyword"
+
+    object While : Keyword("while")
+    object When : Keyword("when")
+    object Do : Keyword("do")
+    object If : Keyword("if")
+    object Else : Keyword("else")
+
+    companion object {
+        private val all = setOf(While, When, Do, If, Else)
+
+        fun lookup(value: String) =
+            all.firstOrNull { it?.value == value }
+    }
+}
+
 @Suppress("ClassName")
 sealed class PrimitiveType(val spell: String) : AbstractToken() {
 
@@ -84,6 +112,7 @@ sealed class Operator(val operator: String) : AbstractToken() {
     override fun otherAttributes(): List<Any> = listOf(operator)
     override fun tokenTypeDescription(): String = "Operator"
 
+    object LogicNot : Operator("!")
     object Plus : Operator("+")
     object PlusPlus : Operator("++")
     object Minus : Operator("-")
@@ -91,12 +120,27 @@ sealed class Operator(val operator: String) : AbstractToken() {
     object Multiply : Operator("*")
     object Divide : Operator("/")
     object Assign : Operator("=")
+    object Equals : Operator("==")
+    object NotEquals : Operator("!=")
     object Greater : Operator(">")
     object Lesser : Operator("<")
 
     companion object {
         // private val all = Operator::class.sealedSubclasses.map { it.objectInstance }
-        private val all = setOf(Plus, Minus, Multiply, Divide, Assign, PlusPlus, MinusMinus, Greater, Lesser)
+        private val all = setOf(
+            LogicNot,
+            Plus,
+            Minus,
+            Multiply,
+            Divide,
+            Assign,
+            Equals,
+            NotEquals,
+            PlusPlus,
+            MinusMinus,
+            Greater,
+            Lesser
+        )
 
         fun lookup(operator: String) = all.firstOrNull { it?.operator == operator }
     }
