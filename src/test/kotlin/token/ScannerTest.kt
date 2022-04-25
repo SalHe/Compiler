@@ -4,6 +4,8 @@ import com.github.salhe.compiler.test.getResourceAsStream
 import com.github.salhe.compiler.token.*
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import java.io.ByteArrayInputStream
+import java.io.InputStreamReader
 
 class ScannerTest {
 
@@ -117,4 +119,140 @@ class ScannerTest {
         Assertions.assertIterableEquals(expectedTokens, tokens)
     }
 
+    private fun String.scan() = Scanner(InputStreamReader(ByteArrayInputStream(this.toByteArray()))).scan()
+    private fun Iterable<Token>.assertEquals(expected: Iterable<Token>, message: (() -> String)? = null) {
+        Assertions.assertIterableEquals(expected, this, message)
+    }
+
+    @Test
+    fun `Simple Test`() {
+        """
+            int he;;if(a )b{}while do print; void
+        """.trimIndent()
+            .scan()
+            .assertEquals(
+                listOf(
+                    PrimitiveType.int,
+                    Identifier("he"),
+                    Punctuation.Semicolon,
+                    Punctuation.Semicolon,
+                    Keyword.If,
+                    Punctuation.LBracket,
+                    Identifier("a"),
+                    Punctuation.RBracket,
+                    Identifier("b"),
+                    Punctuation.LCurlyBracket,
+                    Punctuation.RCurlyBracket,
+                    Keyword.While,
+                    Keyword.Do,
+                    Identifier("print"),
+                    Punctuation.Semicolon,
+                    PrimitiveType.void
+                )
+            )
+    }
+
+    @Test
+    fun `Keyword Test`() {
+        """
+            do while if else
+        """.trimIndent()
+            .scan()
+            .assertEquals(listOf(Keyword.Do, Keyword.While, Keyword.If, Keyword.Else))
+    }
+
+    @Test
+    fun `Operator Test`() {
+        // 目前运算符比较特殊（运算符和其他符合必须由空格分隔，或者以非运算符字符集的字符接壤）
+        // 比如 +++++ 会认为是一个运算符（尽管没有这个运算符，该符号不会进入token流中）
+        // 比如 ++ +++ 会认为是两个运算符，因为他们以空格分隔
+        // 比如 ++i 会认为是一个自增运算符和一个标识符i
+        """
+            a + b = 5 / 10 * 50 - c * void--;
+        """.trimIndent()
+            .scan()
+            .assertEquals(
+                listOf(
+                    Identifier("a"),
+                    Operator.Plus,
+                    Identifier("b"),
+                    Operator.Assign,
+                    Literal.IntegerLiteral("5"),
+                    Operator.Divide,
+                    Literal.IntegerLiteral("10"),
+                    Operator.Multiply,
+                    Literal.IntegerLiteral("50"),
+                    Operator.Minus,
+                    Identifier("c"),
+                    Operator.Multiply,
+                    PrimitiveType.void,
+                    Operator.MinusMinus,
+                    Punctuation.Semicolon
+                )
+            )
+    }
+
+    @Test
+    fun `Identifier Test`() {
+        """
+            hello salhe
+        """.trimIndent()
+            .scan()
+            .assertEquals(
+                listOf(
+                    Identifier("hello"),
+                    Identifier("salhe")
+                )
+            )
+    }
+
+    @Test
+    fun `Literal Test`() {
+        """
+            "Hello, SalHe!"
+            10
+        """.trimIndent()
+            .scan()
+            .assertEquals(
+                listOf(
+                    Literal.StringLiteral("Hello, SalHe!"),
+                    Literal.IntegerLiteral("10")
+                )
+            )
+    }
+
+    @Test
+    fun `Punctuation Test`() {
+        """
+            [ ] { } ; , ( )
+        """.trimIndent()
+            .scan()
+            .assertEquals(
+                listOf(
+                    Punctuation.LRectBracket,
+                    Punctuation.RRectBracket,
+                    Punctuation.LCurlyBracket,
+                    Punctuation.RCurlyBracket,
+                    Punctuation.Semicolon,
+                    Punctuation.Comma,
+                    Punctuation.LBracket,
+                    Punctuation.RBracket,
+                )
+            )
+    }
+
+    @Test
+    fun `Primitive Type Test`() {
+        """
+            void
+            int
+        """.trimIndent()
+            .scan()
+            .assertEquals(
+                listOf(
+                    PrimitiveType.void,
+                    PrimitiveType.int
+                )
+            )
+    }
 }
