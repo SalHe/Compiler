@@ -34,6 +34,8 @@ abstract class Literal : AbstractToken() {
     }
 
     class IntegerLiteral(rawString: String) : NumberLiteral<Int>(rawString.toInt(), rawString)
+    class FloatLiteral(rawString: String) : NumberLiteral<Float>(rawString.toFloat(), rawString)
+    class DoubleLiteral(rawString: String) : NumberLiteral<Double>(rawString.toDouble(), rawString)
 }
 
 class Identifier(val id: String) : AbstractToken() {

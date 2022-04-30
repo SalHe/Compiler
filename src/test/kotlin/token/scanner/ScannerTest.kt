@@ -1,4 +1,4 @@
-package com.github.salhe.compiler.test.token
+package com.github.salhe.compiler.test.token.scanner
 
 import com.github.salhe.compiler.test.getResourceAsStream
 import com.github.salhe.compiler.token.*
@@ -7,6 +7,16 @@ import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
 import java.io.InputStreamReader
 
+fun String.inputStreamReader() = InputStreamReader(ByteArrayInputStream(this.toByteArray()))
+fun String.scan() = Scanner(this.inputStreamReader()).scan()
+fun Iterable<Token>.assertEquals(expected: Iterable<Token>, message: (() -> String)? = null) {
+    Assertions.assertIterableEquals(expected, this, message)
+}
+
+/**
+ * 正常的词法分析测试。
+ *
+ */
 class ScannerTest {
 
     @Test
@@ -119,11 +129,6 @@ class ScannerTest {
         Assertions.assertIterableEquals(expectedTokens, tokens)
     }
 
-    private fun String.scan() = Scanner(InputStreamReader(ByteArrayInputStream(this.toByteArray()))).scan()
-    private fun Iterable<Token>.assertEquals(expected: Iterable<Token>, message: (() -> String)? = null) {
-        Assertions.assertIterableEquals(expected, this, message)
-    }
-
     @Test
     fun `Simple Test`() {
         """
@@ -211,12 +216,18 @@ class ScannerTest {
         """
             "Hello, SalHe!"
             10
+            "Hello. There are some escapes! \\\" \\\\"
+            10.5
+            10.78f
         """.trimIndent()
             .scan()
             .assertEquals(
                 listOf(
                     Literal.StringLiteral("Hello, SalHe!"),
-                    Literal.IntegerLiteral("10")
+                    Literal.IntegerLiteral("10"),
+                    Literal.StringLiteral("Hello. There are some escapes! \\\" \\\\"),
+                    Literal.DoubleLiteral("10.5"),
+                    Literal.FloatLiteral("10.78")
                 )
             )
     }
