@@ -1,14 +1,11 @@
 package com.github.salhe.compiler.test.token.scanner
 
-import com.github.salhe.compiler.test.getResourceAsStream
+import com.github.salhe.compiler.getResourceAsStream
+import com.github.salhe.compiler.scan
 import com.github.salhe.compiler.token.*
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import java.io.ByteArrayInputStream
-import java.io.InputStreamReader
 
-fun String.inputStreamReader() = InputStreamReader(ByteArrayInputStream(this.toByteArray()))
-fun String.scan() = Scanner(this.inputStreamReader()).scan()
 fun Iterable<Token>.assertEquals(expected: Iterable<Token>, message: (() -> String)? = null) {
     Assertions.assertIterableEquals(expected, this, message)
 }

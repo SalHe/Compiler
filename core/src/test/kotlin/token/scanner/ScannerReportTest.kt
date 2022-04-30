@@ -1,5 +1,6 @@
 package com.github.salhe.compiler.test.token.scanner
 
+import com.github.salhe.compiler.scan
 import com.github.salhe.compiler.token.scanner.*
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test

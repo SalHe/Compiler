@@ -1,6 +1,6 @@
 package com.github.salhe.compiler.test.token
 
-import com.github.salhe.compiler.test.token.scanner.inputStreamReader
+import com.github.salhe.compiler.inputStreamReader
 import com.github.salhe.compiler.token.CharStream
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals

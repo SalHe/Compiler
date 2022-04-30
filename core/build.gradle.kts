@@ -1,12 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.10"
+    kotlin("jvm")
     `java-library`
 }
-
-group = "com.github.salhe.compiler"
-version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
