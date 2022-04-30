@@ -8,5 +8,5 @@ repositories {
 
 allprojects {
     group = "com.github.salhe.compiler"
-    version = "1.0-SNAPSHOT"
+    version = "1.0"
 }

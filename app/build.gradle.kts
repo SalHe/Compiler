@@ -18,6 +18,6 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "com.github.salhe.compiler.app.MainKt"
     }
 }
