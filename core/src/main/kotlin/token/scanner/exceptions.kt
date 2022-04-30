@@ -15,4 +15,4 @@ class UnsupportedNumberPrefixException(row: Int, col: Int, val prefix: String) :
     UnsupportedNumberLiteralException(row, col, "不支持字面量中使用前缀: $prefix")
 
 class UnsupportedNumberPostfixException(row: Int, col: Int, val postfix: String) :
-    UnsupportedNumberLiteralException(row, col, "不支持字面量中使用前缀: $postfix")
+    UnsupportedNumberLiteralException(row, col, "不支持字面量中使用后缀: $postfix")
