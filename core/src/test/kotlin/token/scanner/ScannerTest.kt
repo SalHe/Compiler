@@ -218,6 +218,8 @@ class ScannerTest {
             "Hello. There are some escapes! \\\" \\\\"
             10.5
             10.78f
+            true
+            false
         """.trimIndent()
             .scan()
             .assertEquals(
@@ -226,7 +228,9 @@ class ScannerTest {
                     Literal.IntegerLiteral("10"),
                     Literal.StringLiteral("Hello. There are some escapes! \\\" \\\\"),
                     Literal.DoubleLiteral("10.5"),
-                    Literal.FloatLiteral("10.78")
+                    Literal.FloatLiteral("10.78"),
+                    Literal.BooleanLiteral.True,
+                    Literal.BooleanLiteral.False
                 )
             )
     }
@@ -254,14 +258,28 @@ class ScannerTest {
     @Test
     fun `Primitive Type Test`() {
         """
-            void
-            int
+            void    
+            boolean 
+            char    
+            byte    
+            short   
+            int     
+            long    
+            float   
+            double  
         """.trimIndent()
             .scan()
             .assertEquals(
                 listOf(
                     PrimitiveType.void,
-                    PrimitiveType.int
+                    PrimitiveType.boolean,
+                    PrimitiveType.char,
+                    PrimitiveType.byte,
+                    PrimitiveType.short,
+                    PrimitiveType.int,
+                    PrimitiveType.long,
+                    PrimitiveType.float,
+                    PrimitiveType.double,
                 )
             )
     }

@@ -28,6 +28,23 @@ abstract class Literal : AbstractToken() {
         override fun otherAttributes(): List<Any> = listOf("\"$string\"")
     }
 
+    sealed class BooleanLiteral(val value: Boolean) : Literal() {
+
+        override fun tokenTypeDescription(): String = "BooleanLiteral"
+        override fun otherAttributes(): List<Any> = listOf(value)
+
+        object True : BooleanLiteral(true)
+        object False : BooleanLiteral(false)
+
+        companion object {
+            fun lookup(spell: String): BooleanLiteral? {
+                if (spell == "true") return True
+                else if (spell == "false") return False
+                return null
+            }
+        }
+    }
+
     open class NumberLiteral<T>(val value: T, val rawString: String) : Literal() {
         override fun otherAttributes(): List<Any> = listOf(value as Any, "\"$rawString\"")
     }
@@ -98,14 +115,21 @@ sealed class PrimitiveType(val spell: String) : AbstractToken() {
 
     companion object {
         // private val all = PrimitiveType::class.sealedSubclasses.map { it.objectInstance }
-        private val all = setOf(void, int)
+        private val all = setOf(void, boolean, char, byte, short, int, long, float, double)
 
         fun lookup(spell: String) =
             all.firstOrNull { it?.spell == spell }
     }
 
     object void : PrimitiveType("void")
+    object boolean : PrimitiveType("boolean")
+    object char : PrimitiveType("char")
+    object byte : PrimitiveType("byte")
+    object short : PrimitiveType("short")
     object int : PrimitiveType("int")
+    object long : PrimitiveType("long")
+    object float : PrimitiveType("float")
+    object double : PrimitiveType("double")
 }
 
 sealed class Operator(val operator: String) : AbstractToken() {

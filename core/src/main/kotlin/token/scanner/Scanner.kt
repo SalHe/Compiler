@@ -219,6 +219,7 @@ private fun scanWord(
     var token: Token? = null
     @Suppress("KotlinConstantConditions", "ControlFlowWithEmptyBody", "SENSELESS_COMPARISON")
     if (token == null) token = Keyword.lookup(word)
+    if (token == null) token = Literal.BooleanLiteral.lookup(word)
     if (token == null) token = PrimitiveType.lookup(word)
     if (token == null) token = fetchIdentifier(word)
     return Result.success(token)
