@@ -4,7 +4,12 @@
 
 编译原理实习代码。
 
-## 代码简要介绍
+## 运行
+
+1. Clone源代码并用IDEA打开运行
+2. 直接运行已打包程序：[下载](https://github.com/SalHe/compiler/releases)
+
+## 简要介绍
 
 ### 词法分析
 
