@@ -6,6 +6,9 @@ class ExpectQuoteException(row: Int, col: Int) : ScannerException(row, col, "字
 class InvalidEscapeCharException(row: Int, col: Int, val expression: String) :
     ScannerException(row, col, "错误的转义字符：$expression")
 
+internal class NotCommentException(row: Int, col: Int) : ScannerException(row, col, "当前'/'开头的不是一个备注，但是您不应该看到该提示！")
+class NonTerminalMultilineComment(row: Int, col: Int) : ScannerException(row, col, "多行注释应以\"*/\"结尾")
+
 class UnexpectedCharException(row: Int, col: Int, val char: Char) : ScannerException(row, col, "出现了不应出现的字符：'${char}'")
 
 sealed class UnsupportedNumberLiteralException(row: Int, col: Int, message: String?) :

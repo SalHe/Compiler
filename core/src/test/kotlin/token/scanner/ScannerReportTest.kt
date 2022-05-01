@@ -4,6 +4,7 @@ import com.github.salhe.compiler.scan
 import com.github.salhe.compiler.token.scanner.*
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 
 /**
@@ -28,28 +29,44 @@ class ScannerReportTest {
             val actualException = Assertions.assertThrows(exception.javaClass) { src.scan() }
             assertEquals(exception.row, actualException.row)
             assertEquals(exception.col, actualException.col)
+            assertScannerExceptionEquals(exception, actualException)
+        }
+    }
 
-            when (exception) {
-                is ExpectQuoteException -> {}
-                is InvalidEscapeCharException -> assertEquals(
-                    exception.expression,
-                    (actualException as InvalidEscapeCharException).expression
+    private fun assertScannerExceptionEquals(exception: ScannerException, actualException: ScannerException) {
+        when (exception) {
+            is ExpectQuoteException -> {}
+            is InvalidEscapeCharException -> assertEquals(
+                exception.expression,
+                (actualException as InvalidEscapeCharException).expression
+            )
+            is UnexpectedCharException -> assertEquals(
+                exception.char,
+                (actualException as UnexpectedCharException).char
+            )
+            is UnsupportedNumberLiteralException -> when (exception) {
+                is UnsupportedNumberPostfixException -> assertEquals(
+                    exception.postfix,
+                    (actualException as UnsupportedNumberPostfixException).postfix
                 )
-                is UnexpectedCharException -> assertEquals(
-                    exception.char,
-                    (actualException as UnexpectedCharException).char
+                is UnsupportedNumberPrefixException -> assertEquals(
+                    exception.prefix,
+                    (actualException as UnsupportedNumberPrefixException).prefix
                 )
-                is UnsupportedNumberLiteralException -> when (exception) {
-                    is UnsupportedNumberPostfixException -> assertEquals(
-                        exception.postfix,
-                        (actualException as UnsupportedNumberPostfixException).postfix
-                    )
-                    is UnsupportedNumberPrefixException -> assertEquals(
-                        exception.prefix,
-                        (actualException as UnsupportedNumberPrefixException).prefix
-                    )
-                }
             }
+            is NonTerminalMultilineComment -> {}
+            is NotCommentException -> throw IllegalStateException("不应该能够收到[NotCommentException]。")
+        }
+    }
+
+    @Test
+    fun `Non terminal multiline comment test`() {
+        assertThrows<NonTerminalMultilineComment> {
+            """
+            /*
+                咱们就是说，这个多行注释缺个结尾
+            """.trimIndent()
+                .scan()
         }
     }
 

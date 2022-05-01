@@ -147,3 +147,16 @@ sealed class Operator(val operator: String) : AbstractToken() {
         fun lookup(operator: String) = all.firstOrNull { it?.operator == operator }
     }
 }
+
+sealed class Comment(val content: String) : AbstractToken() {
+
+    override fun tokenTypeDescription(): String = "${Comment::class.java.simpleName}.${this::class.java.simpleName}"
+
+    class SingleLine(content: String) : Comment(content) {
+        override fun otherAttributes(): List<Any> = listOf("//$content")
+    }
+
+    class Multiline(content: String) : Comment(content) {
+        override fun otherAttributes(): List<Any> = listOf("/*$content*/")
+    }
+}

@@ -3,8 +3,10 @@ package com.github.salhe.compiler.test.token.scanner
 import com.github.salhe.compiler.getResourceAsStream
 import com.github.salhe.compiler.scan
 import com.github.salhe.compiler.token.*
+import com.github.salhe.compiler.token.scanner.Scanner
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import kotlin.test.assertNotEquals
 
 fun Iterable<Token>.assertEquals(expected: Iterable<Token>, message: (() -> String)? = null) {
     Assertions.assertIterableEquals(expected, this, message)
@@ -263,4 +265,55 @@ class ScannerTest {
                 )
             )
     }
+
+    @Test
+    fun `Comment test`() {
+        val lineComment = " hello comment"
+        val multilineComment = """
+            This is a multiline comment. you can enter any character in it.
+            &#$&*2-/~+
+        """.trimIndent()
+        """
+            there is a line comment and multiline comment //$lineComment
+            /*$multilineComment*/
+        """.trimIndent()
+            .scan()
+            .assertEquals(
+                listOf(
+                    Identifier("there"),
+                    Identifier("is"),
+                    Identifier("a"),
+                    Identifier("line"),
+                    Identifier("comment"),
+                    Identifier("and"),
+                    Identifier("multiline"),
+                    Identifier("comment"),
+
+                    Comment.SingleLine(lineComment),
+                    Comment.Multiline(lineComment),
+                )
+            )
+    }
+
+    @Test
+    fun `Confused comment and operator test`() {
+        mapOf(
+            """
+            / *
+                this should not recognized as multiline comment
+            */
+            """.trimIndent() to Comment.Multiline::class.java,
+            """
+                this should not recognized as single line comment
+            """.trimIndent() to Comment.SingleLine::class.java
+        ).forEach { (src, clazz) ->
+            src.scan()
+                .first()
+                .let {
+                    // 尽量不使用kotlin反射
+                    assertNotEquals<Class<*>>(it.javaClass, clazz)
+                }
+        }
+    }
+
 }

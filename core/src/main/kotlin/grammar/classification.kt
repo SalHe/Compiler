@@ -2,6 +2,7 @@ package com.github.salhe.compiler.grammar
 
 import com.github.salhe.compiler.grammar.GrammarClassification.*
 import com.github.salhe.compiler.token.*
+import com.github.salhe.compiler.token.scanner.Scanner
 import java.io.ByteArrayInputStream
 
 enum class GrammarClassification {

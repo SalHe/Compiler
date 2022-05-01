@@ -1,7 +1,7 @@
 package com.github.salhe.compiler.test.token
 
 import com.github.salhe.compiler.getResourceAsStream
-import com.github.salhe.compiler.token.Scanner
+import com.github.salhe.compiler.token.scanner.Scanner
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 

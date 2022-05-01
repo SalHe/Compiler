@@ -1,6 +1,6 @@
 package com.github.salhe.compiler
 
-import com.github.salhe.compiler.token.Scanner
+import com.github.salhe.compiler.token.scanner.Scanner
 import java.io.ByteArrayInputStream
 import java.io.InputStreamReader
 
