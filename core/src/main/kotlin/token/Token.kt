@@ -16,8 +16,7 @@ abstract class AbstractToken : Token {
 
     override fun equals(other: Any?): Boolean {
         if (this === other || this.toString() == other.toString()) return true
-        if (javaClass != other?.javaClass) return false
-        return true
+        return false
     }
 
     override fun hashCode(): Int = toString().hashCode()

@@ -290,7 +290,7 @@ class ScannerTest {
                     Identifier("comment"),
 
                     Comment.SingleLine(lineComment),
-                    Comment.Multiline(lineComment),
+                    Comment.Multiline(multilineComment),
                 )
             )
     }
