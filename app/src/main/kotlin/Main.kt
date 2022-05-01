@@ -71,6 +71,7 @@ fun Scanner() {
             Row {
                 Button(
                     onClick = {
+                        analysisResult = Result.success(listOf()) // 清空
                         analysisResult = try {
                             analysing = true
                             val tokens = src.scan(lineSeparator)
