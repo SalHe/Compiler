@@ -1,5 +1,6 @@
 package com.github.salhe.compiler.grammar
 
+import com.github.salhe.compiler.filterComment
 import com.github.salhe.compiler.grammar.GrammarClassification.*
 import com.github.salhe.compiler.token.*
 import com.github.salhe.compiler.token.scanner.Scanner
@@ -76,8 +77,8 @@ fun analyseGrammar(grammar: String): Grammar {
     return analyseGrammar(tokens)
 }
 
-fun analyseGrammar(tokens:List<Token>):Grammar{
-    val iterator = tokens.iterator()
+fun analyseGrammar(tokens: List<Token>): Grammar {
+    val iterator = tokens.filterComment().iterator()
 
     if (!iterator.hasNext() || iterator.next() != Punctuation.LBracket) throw MissingBracketException("左括号", "(")
     val nonTerminals = listLetterSet(iterator) { Letter.NonTerminal(it) }
@@ -143,7 +144,7 @@ private fun listProducers(iterator: Iterator<Token>, findLetter: (String) -> Let
 
     // 缺少左花括号
     if (!iterator.hasNext() || iterator.next() != Punctuation.LCurlyBracket) throw GrammarException("字母集是一个花括号包裹、逗号分隔的集合")
-    if (!iterator.hasNext()) throw  GrammarException("字母集合描述不完整")
+    if (!iterator.hasNext()) throw GrammarException("字母集合描述不完整")
 
     var next = iterator.next()
     while (next != Punctuation.RCurlyBracket) {
@@ -182,7 +183,7 @@ private fun <R> listLetterSet(iterator: Iterator<Token>, builder: (exp: String) 
 
     // 缺少左花括号
     if (!iterator.hasNext() || iterator.next() != Punctuation.LCurlyBracket) throw GrammarException("字母集是一个花括号包裹、逗号分隔的集合")
-    if (!iterator.hasNext()) throw  GrammarException("字母集合描述不完整")
+    if (!iterator.hasNext()) throw GrammarException("字母集合描述不完整")
 
     var next = iterator.next()
     while (next != Punctuation.RCurlyBracket) {

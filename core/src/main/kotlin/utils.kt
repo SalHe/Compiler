@@ -1,5 +1,7 @@
 package com.github.salhe.compiler
 
+import com.github.salhe.compiler.token.Comment
+import com.github.salhe.compiler.token.Token
 import com.github.salhe.compiler.token.scanner.Scanner
 import java.io.ByteArrayInputStream
 import java.io.InputStreamReader
@@ -13,3 +15,5 @@ fun String.scan(lineSeparator: Boolean = false) = Scanner(this.inputStreamReader
 
 fun getResourceAsStream(path: String) =
     ClassLoader.getSystemResourceAsStream(path) ?: throw IllegalStateException("请在资源文件中放入$path")
+
+fun Iterable<Token>.filterComment() = this.filter { it !is Comment }
