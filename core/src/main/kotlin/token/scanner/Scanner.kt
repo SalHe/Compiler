@@ -21,7 +21,7 @@ class Scanner(
         return identifier
     }
 
-    fun scan(): List<Token> {
+    fun scan(lineSeparator: Boolean = false): List<Token> {
         while (!charStream.eof) {
             var token: Token? = null
             val cur = charStream.top()
@@ -56,6 +56,22 @@ class Scanner(
                 // 操作符
                 // * 不可与注释处理交换顺序
                 cur.isOperator() -> token = scanOperator(charStream).getOrThrow()
+
+                // 扫描换行符，为不需要以分号作为语句分隔符做准备
+                lineSeparator && cur == '\r' -> {
+                    charStream.consume()
+                    token = if (charStream.top() == '\n') {
+                        charStream.consume()
+                        LineSeparator.CRLF
+                    } else {
+                        LineSeparator.CR
+                    }
+                }
+                lineSeparator && cur == '\n' -> {
+                    charStream.consume()
+                    token = LineSeparator.LF
+                }
+
                 cur.isWhitespace() -> charStream.consume()
                 else -> {
                     // 边界符较为简单，放到此处

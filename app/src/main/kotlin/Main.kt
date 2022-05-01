@@ -6,10 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,24 +63,32 @@ fun Scanner() {
     }
     var analysisResult by remember { mutableStateOf(Result.success<List<Token>>(listOf())) }
     var analysing by remember { mutableStateOf(false) }
+    var lineSeparator by remember { mutableStateOf(false) }
     Row(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.weight(1f).fillMaxSize()) {
             Text("源代码(类C语言)：")
             TextField(src, { src = it }, modifier = Modifier.weight(1f).fillMaxWidth())
-            Button(
-                onClick = {
-                    analysisResult = try {
-                        analysing = true
-                        val tokens = src.scan()
-                        Result.success(tokens)
-                    } catch (e: Exception) {
-                        Result.failure(e)
-                    } finally {
-                        analysing = false
-                    }
-                }, enabled = !analysing
-            ) {
-                Text("分析")
+            Row {
+                Button(
+                    onClick = {
+                        analysisResult = try {
+                            analysing = true
+                            val tokens = src.scan(lineSeparator)
+                            Result.success(tokens)
+                        } catch (e: Exception) {
+                            Result.failure(e)
+                        } finally {
+                            analysing = false
+                        }
+                    }, enabled = !analysing
+                ) {
+                    Text("分析")
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    // 这里应该有联合效果
+                    Checkbox(lineSeparator, { lineSeparator = it })
+                    Text("包括换行符")
+                }
             }
         }
         Box(modifier = Modifier.weight(1f)) {

@@ -316,4 +316,10 @@ class ScannerTest {
         }
     }
 
+    @Test
+    fun `Line separator test`() {
+        "\r \r\n \n".scan(lineSeparator = true)
+            .assertEquals(listOf(LineSeparator.CR, LineSeparator.CRLF, LineSeparator.LF))
+    }
+
 }

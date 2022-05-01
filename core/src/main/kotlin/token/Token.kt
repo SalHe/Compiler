@@ -160,3 +160,11 @@ sealed class Comment(val content: String) : AbstractToken() {
         override fun otherAttributes(): List<Any> = listOf("/*$content*/")
     }
 }
+
+sealed class LineSeparator(val separator: String) : AbstractToken() {
+    override fun otherAttributes(): List<Any> = listOf()
+
+    object CRLF : LineSeparator("\r\n")
+    object LF : LineSeparator("\n")
+    object CR : LineSeparator("\r")
+}
