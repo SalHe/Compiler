@@ -11,15 +11,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.github.salhe.compiler.scan
+import com.github.salhe.compiler.token.Comment
 import com.github.salhe.compiler.token.Token
 import com.github.salhe.compiler.token.scanner.ScannerException
 
 fun main() = application {
-    val state = rememberWindowState()
+    val state = rememberWindowState(width = 1000.dp)
     Window(
         onCloseRequest = ::exitApplication,
         title = "Compiler",
@@ -63,31 +65,64 @@ fun Scanner() {
     }
     var analysisResult by remember { mutableStateOf(Result.success<List<Token>>(listOf())) }
     var analysing by remember { mutableStateOf(false) }
+    var realTimeAnalysing by remember { mutableStateOf(true) }
+    var ignoreComment by remember { mutableStateOf(false) }
     var lineSeparator by remember { mutableStateOf(false) }
+
+    fun analyseSource() {
+        analysisResult = Result.success(listOf()) // 清空
+        analysisResult = try {
+            analysing = true
+            val tokens = src.scan(lineSeparator)
+            Result.success(tokens)
+        } catch (e: Exception) {
+            Result.failure(e)
+        } finally {
+            analysing = false
+        }
+    }
+
+    fun analyseSourceIfRealtime() {
+        if (realTimeAnalysing) analyseSource()
+    }
+
+    analyseSourceIfRealtime()
+
     Row(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.weight(1f).fillMaxSize()) {
             Text("源代码(类C语言)：")
-            TextField(src, { src = it }, modifier = Modifier.weight(1f).fillMaxWidth())
+            TextField(src, {
+                src = it
+                analyseSource()
+            }, modifier = Modifier.weight(1f).fillMaxWidth())
             Row {
                 Button(
-                    onClick = {
-                        analysisResult = Result.success(listOf()) // 清空
-                        analysisResult = try {
-                            analysing = true
-                            val tokens = src.scan(lineSeparator)
-                            Result.success(tokens)
-                        } catch (e: Exception) {
-                            Result.failure(e)
-                        } finally {
-                            analysing = false
-                        }
-                    }, enabled = !analysing
+                    onClick = ::analyseSource, enabled = !realTimeAnalysing && !analysing
                 ) {
                     Text("分析")
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     // 这里应该有联合效果
-                    Checkbox(lineSeparator, { lineSeparator = it })
+                    Checkbox(realTimeAnalysing, {
+                        realTimeAnalysing = it
+                        analyseSourceIfRealtime()
+                    })
+                    Text("实时分析")
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    // 这里应该有联合效果
+                    Checkbox(ignoreComment, {
+                        ignoreComment = it
+                        analyseSourceIfRealtime()
+                    })
+                    Text("忽略注释")
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    // 这里应该有联合效果
+                    Checkbox(lineSeparator, {
+                        lineSeparator = it
+                        analyseSourceIfRealtime()
+                    })
                     Text("包括换行符")
                 }
             }
@@ -97,8 +132,12 @@ fun Scanner() {
 
             LazyColumn(state = listState) {
                 analysisResult
-                    .onSuccess {
-                        itemsIndexed(it) { index, token -> Text("@$index: $token") }
+                    .onSuccess { tokens ->
+                        itemsIndexed(if (ignoreComment) tokens.filter { it !is Comment } else tokens) { index, token ->
+                            Text(
+                                "@$index: $token"
+                            )
+                        }
                         item { Text("到底咯~~~") }
                     }.onFailure { exception ->
                         if (exception is ScannerException) {
