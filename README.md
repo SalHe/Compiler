@@ -32,9 +32,13 @@
 ### 语法分类
 
 - PSG
-- CFG
+  ![PSG](./docs/PSG.png)
 - CSG
+  ![CSG](./docs/CSG.png)
+- CFG
+  ![CFG](./docs/CFG.png)
 - RG(左线性、右线性，虽然没特殊声明，但代码已做区分)
+  ![RG](./docs/RG.png)
 
 ## 感受
 
