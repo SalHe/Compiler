@@ -15,6 +15,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.github.salhe.compiler.grammar.GrammarClassification
+import com.github.salhe.compiler.grammar.GrammarException
+import com.github.salhe.compiler.grammar.analyseGrammar
+import com.github.salhe.compiler.grammar.classifyGrammar
 import com.github.salhe.compiler.scan
 import com.github.salhe.compiler.token.Comment
 import com.github.salhe.compiler.token.Token
@@ -64,22 +68,34 @@ fun Scanner() {
         )
     }
     var analysisResult by remember { mutableStateOf(Result.success<List<Token>>(listOf())) }
+    var grammarClassification by remember { mutableStateOf(Result.success<GrammarClassification?>(null)) }
     var analysing by remember { mutableStateOf(false) }
     var realTimeAnalysing by remember { mutableStateOf(true) }
     var ignoreComment by remember { mutableStateOf(false) }
     var lineSeparator by remember { mutableStateOf(false) }
 
     fun analyseSource() {
+        analysing = true
         analysisResult = Result.success(listOf()) // 清空
         analysisResult = try {
-            analysing = true
             val tokens = src.scan(lineSeparator)
             Result.success(tokens)
         } catch (e: Exception) {
             Result.failure(e)
-        } finally {
-            analysing = false
         }
+
+        analysisResult
+            .onSuccess { tokens ->
+                grammarClassification = try {
+                    Result.success(classifyGrammar(analyseGrammar(tokens.filterComment())))
+                } catch (e: GrammarException) {
+                    Result.failure(e)
+                }
+            }.onFailure {
+                grammarClassification = Result.failure(it)
+            }
+
+        analysing = false
     }
 
     fun analyseSourceIfRealtime() {
@@ -131,9 +147,17 @@ fun Scanner() {
             val listState = rememberLazyListState()
 
             LazyColumn(state = listState) {
+
                 analysisResult
                     .onSuccess { tokens ->
-                        itemsIndexed(if (ignoreComment) tokens.filter { it !is Comment } else tokens) { index, token ->
+
+                        grammarClassification.onSuccess {
+                            if (it != null) {
+                                item { Text("你可能输入的是一个文法描述，文法类型为：$it") }
+                            }
+                        }
+
+                        itemsIndexed(if (ignoreComment) tokens.filterComment() else tokens) { index, token ->
                             Text(
                                 "@$index: $token"
                             )
@@ -160,3 +184,5 @@ fun Scanner() {
         }
     }
 }
+
+fun Iterable<Token>.filterComment() = this.filter { it !is Comment }

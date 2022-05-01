@@ -16,13 +16,13 @@ enum class GrammarClassification {
      * 上下文相关文法
      *
      */
-    CFG,
+    CSG,
 
     /**
      * 上下文无关文法
      *
      */
-    CSG,
+    CFG,
 
     /**
      * 正规文法
@@ -73,6 +73,10 @@ data class Grammar(
  */
 fun analyseGrammar(grammar: String): Grammar {
     val tokens = Scanner(ByteArrayInputStream(grammar.toByteArray()).reader()).scan()
+    return analyseGrammar(tokens)
+}
+
+fun analyseGrammar(tokens:List<Token>):Grammar{
     val iterator = tokens.iterator()
 
     if (!iterator.hasNext() || iterator.next() != Punctuation.LBracket) throw MissingBracketException("左括号", "(")
@@ -110,12 +114,12 @@ fun classifyGrammar(grammar: Grammar): GrammarClassification {
         } else if (grammar.producers.all { it.right.size == 1 || (it.right.size == 2 && it.right[1] is Letter.Terminal) }) {
             RG // 右线性正则文法
         } else {
-            CSG // 上下文相关文法
+            CFG // 上下文相关文法
         }
     } else {
         // 右部长度至少为1
         if (grammar.producers.all { it.right.isNotEmpty() })
-            return CFG
+            return CSG
 
         return PSG
     }

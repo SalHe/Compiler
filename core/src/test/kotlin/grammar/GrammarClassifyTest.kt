@@ -52,7 +52,7 @@ class GrammarClassifyTest {
                     },
                     Start
                 )
-            """.trimIndent() to GrammarClassification.CFG,
+            """.trimIndent() to GrammarClassification.CSG,
 
             // 对应PPT：第2章 形式语言概论.pdf，第29页
             """
@@ -71,7 +71,7 @@ class GrammarClassifyTest {
                     },
                     NTZ
                 )
-            """.trimIndent() to GrammarClassification.CSG,
+            """.trimIndent() to GrammarClassification.CFG,
 
             // 对应PPT：第2章 形式语言概论.pdf，第30页
             """
