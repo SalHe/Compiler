@@ -19,5 +19,6 @@ dependencies {
 compose.desktop {
     application {
         mainClass = "com.github.salhe.compiler.app.MainKt"
+        jvmArgs("-Dfile.encoding=utf-8")
     }
 }
