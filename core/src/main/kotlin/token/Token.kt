@@ -1,11 +1,11 @@
 package com.github.salhe.compiler.token
 
-sealed interface Token
+sealed interface Token {
+    fun otherAttributes(): List<Any>
+    fun tokenTypeDescription(): String = this.javaClass.simpleName
+}
 
 abstract class AbstractToken : Token {
-
-    protected abstract fun otherAttributes(): List<Any>
-    protected open fun tokenTypeDescription(): String = this.javaClass.simpleName
 
     override fun toString(): String {
         val otherAttributes = otherAttributes()

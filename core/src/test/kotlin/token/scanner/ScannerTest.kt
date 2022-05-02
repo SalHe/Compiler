@@ -2,15 +2,12 @@ package com.github.salhe.compiler.test.token.scanner
 
 import com.github.salhe.compiler.getResourceAsStream
 import com.github.salhe.compiler.scan
+import com.github.salhe.compiler.test.assertEquals
 import com.github.salhe.compiler.token.*
 import com.github.salhe.compiler.token.scanner.Scanner
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import kotlin.test.assertNotEquals
-
-fun Iterable<Token>.assertEquals(expected: Iterable<Token>, message: (() -> String)? = null) {
-    Assertions.assertIterableEquals(expected, this, message)
-}
 
 /**
  * 正常的词法分析测试。

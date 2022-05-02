@@ -9,7 +9,36 @@ interface Stream<T> {
     val eof: Boolean
     fun top(): T
     fun consume(): T
+    fun tell(): Int
 
+}
+
+interface ReversibleStream<T> : Stream<T> {
+    fun save()
+    fun restore(): Int
+    fun drop(): Int
+}
+
+abstract class AbstractStream<T> : Stream<T> {
+
+    protected var top: T? = null
+    private var init: Boolean = false
+
+    override fun consume(): T {
+        val old = top()
+        if (!eof) top = read()
+        return old
+    }
+
+    override fun top(): T {
+        if (!init) {
+            top = read()
+            init = true
+        }
+        return top!!
+    }
+
+    abstract fun read(): T
 }
 
 interface CharStream : Stream<Char> {
@@ -28,6 +57,7 @@ fun CharStream(sr: InputStreamReader): CharStream = object : CharStream {
         get() = _col
 
     private var currentChar: Char = '\u0000' // 一定会被初始化输入流中首个字符
+    private var pos: Int = 0
 
     @Suppress("ObjectPropertyName")
     private var _row: Int = 0
@@ -43,6 +73,7 @@ fun CharStream(sr: InputStreamReader): CharStream = object : CharStream {
 
     private fun read() {
         currentChar = sr.read().toChar()
+        pos++
         if (!eof) {
             if (currentChar == '\n') {
                 _row++
@@ -62,5 +93,7 @@ fun CharStream(sr: InputStreamReader): CharStream = object : CharStream {
             read()
         return old
     }
+
+    override fun tell(): Int = pos
 
 }
