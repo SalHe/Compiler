@@ -35,7 +35,7 @@ class Parser(private val tokenStream: TokenStream) {
         stream.save()
         val statements = mutableListOf<Statement>()
         while (!stream.eof && stream.top() != Punctuation.RCurlyBracket) {
-            if (stream.top() != Punctuation.Semicolon && stream.top() !is LineSeparator && stream.top() != Punctuation.RCurlyBracket) {
+            if (stream.top() != Punctuation.Semicolon && stream.top() !is LineSeparator) {
                 statements.add(parseDeclaration(stream, scope))
             }
 
@@ -58,7 +58,7 @@ class Parser(private val tokenStream: TokenStream) {
 
     private fun parseStatementsBlock(stream: TokenStream, scope: Scope<String, Symbol>): Block {
         stream.expect(Punctuation.LCurlyBracket)
-        val statements = parseStatements(stream, scope)
+        val statements = parseStatements(stream, scope.new())
         stream.expect(Punctuation.RCurlyBracket)
         return Block(statements)
     }
