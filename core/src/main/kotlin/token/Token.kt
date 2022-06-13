@@ -137,7 +137,7 @@ sealed class Operator(val operator: String) : AbstractToken() {
     override fun otherAttributes(): List<Any> = listOf(operator)
     override fun tokenTypeDescription(): String = "Operator"
 
-    object LogicNot : Operator("!")
+    object LNot : Operator("!")
     object Plus : Operator("+")
     object PlusPlus : Operator("++")
     object Minus : Operator("-")
@@ -147,13 +147,20 @@ sealed class Operator(val operator: String) : AbstractToken() {
     object Assign : Operator("=")
     object Equals : Operator("==")
     object NotEquals : Operator("!=")
-    object Greater : Operator(">")
-    object Lesser : Operator("<")
+    object Gt : Operator(">")
+    object GE : Operator(">=")
+    object Lt : Operator("<")
+    object LE : Operator("<=")
+    object LAnd : Operator("&&")
+    object LOr : Operator("||")
+    object And : Operator("&")
+    object Or : Operator("|")
+    object Bitwise : Operator("~")
+    object Xor : Operator("^")
 
     companion object {
         // private val all = Operator::class.sealedSubclasses.map { it.objectInstance }
         private val all = setOf(
-            LogicNot,
             Plus,
             Minus,
             Multiply,
@@ -163,8 +170,12 @@ sealed class Operator(val operator: String) : AbstractToken() {
             NotEquals,
             PlusPlus,
             MinusMinus,
-            Greater,
-            Lesser
+            LNot,
+            Gt, GE,
+            Lt, LE,
+            LAnd,
+            LOr,
+            And, Or, Bitwise, Xor
         )
 
         fun lookup(operator: String) = all.firstOrNull { it?.operator == operator }

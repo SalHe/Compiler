@@ -68,7 +68,7 @@ class ScannerTest {
             Keyword.If,
             Punctuation.LBracket,
             Identifier("a"),
-            Operator.Lesser,
+            Operator.Lt,
             Literal.IntegerLiteral("5"),
             Punctuation.RBracket,
             Punctuation.LCurlyBracket,
@@ -83,7 +83,7 @@ class ScannerTest {
 
             Keyword.While,
             Punctuation.LBracket,
-            Operator.LogicNot,
+            Operator.LNot,
             Identifier("b"),
             Punctuation.RBracket,
             Punctuation.LCurlyBracket,

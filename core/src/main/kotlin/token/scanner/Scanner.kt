@@ -101,7 +101,11 @@ fun Char.isDigit(): Boolean = this in '0'..'9'
 fun Char.isValidWordStart(): Boolean = this == '_' || this in 'A'..'Z' || this in 'a'..'z'
 fun Char.isValidWordChar(): Boolean = this.isValidWordStart() || this.isDigit()
 fun Char.isOperator(): Boolean = this.isComputingSign() || this.isComparator() || this == '='
-fun Char.isComputingSign(): Boolean = this == '+' || this == '-' || this == '*' || this == '/' || this == '!'
+fun Char.isComputingSign(): Boolean =
+    this == '+' || this == '-' || this == '*' || this == '/'
+            || this == '!' || this == '|' || this == '&'
+            || this == '^' || this == '~'
+
 fun Char.isComparator(): Boolean = this == '<' || this == '>'
 fun Char.isQuote(): Boolean = this == '"'
 

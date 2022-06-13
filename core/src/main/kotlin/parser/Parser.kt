@@ -3,6 +3,7 @@ package com.github.salhe.compiler.parser
 import com.github.salhe.compiler.filterComment
 import com.github.salhe.compiler.parser.ast.*
 import com.github.salhe.compiler.token.*
+import java.util.Stack
 
 
 class Parser(private val tokenStream: TokenStream) {
@@ -28,8 +29,39 @@ class Parser(private val tokenStream: TokenStream) {
         //  2. 解决符号引用问题（边解析边填充符号表）
         //  3. 有错误及时报告
         // 约定：状态保存、恢复由被调解析函数完成
-        return parseStatements(tokenStream, scope)
+        // return parseStatements(tokenStream, scope)
+        return parseProgram(tokenStream, scope)
     }
+
+    private inline fun <R : AST> runParsing(
+        stream: TokenStream,
+        scope: Scope<String, Symbol>,
+        block: (scope: Scope<String, Symbol>) -> R
+    ): R {
+        stream.save()
+        return try {
+            val r = block(scope)
+            stream.drop()
+            r
+        } catch (e: ParserException) {
+            stream.restore()
+            throw e
+        }
+    }
+
+    private fun parseProgram(stream: TokenStream, scope: Scope<String, Symbol>): Program =
+        runParsing(stream, scope) {
+            val globals = mutableListOf<Declaration.Variable>()
+            val functions = mutableListOf<Declaration.Function>()
+            while (!stream.eof) {
+                when (val declaration = parseDeclaration(stream, scope)) {
+                    is Declaration.Variable -> globals.add(declaration)
+                    is Declaration.Function -> functions.add(declaration)
+                    else -> throw UnexpectedParsingException(stream.tell())
+                }
+            }
+            return Program(globals, functions)
+        }
 
     private fun parseStatements(stream: TokenStream, scope: Scope<String, Symbol>): Statements {
         stream.save()
@@ -80,9 +112,7 @@ class Parser(private val tokenStream: TokenStream) {
     private fun parseVariableDeclaration(
         stream: TokenStream,
         scope: Scope<String, Symbol>
-    ): Declaration.Variable {
-        stream.save()
-
+    ): Declaration.Variable = runParsing(stream, scope) {
         val type: Type = scope.resolveType(stream.consume(), stream.tell() - 1)
         val identifier = stream.expectNewIdentifier(scope)
 
@@ -91,7 +121,6 @@ class Parser(private val tokenStream: TokenStream) {
         }
 
         val expression = parseExpression(stream, scope)
-        stream.drop()
         val variable = Declaration.Variable(type, identifier.id, expression)
         scope[identifier.id] = ASTSymbol(variable)
         return variable
@@ -100,34 +129,32 @@ class Parser(private val tokenStream: TokenStream) {
     private fun parseExpression(
         stream: TokenStream,
         parentScope: Scope<String, Symbol>
-    ): Expression {
-        stream.save()
-        // 先支持简单的字面量
-        val literal = stream.consume()
-        if (literal !is Literal) {
-            stream.restore()
-            throw IllegalStateException("目前只支持字面量表达式")
+    ): Expression = runParsing(stream, parentScope) {
+        val operatorStack = Stack<Operator>()
+        val operandStack = Stack<Expression>()
+        while (!stream.eof && stream.top() != Punctuation.Semicolon && stream.top() !is LineSeparator) {
+
+            val top = stream.top()
+            if (top is Operator) {
+
+            }
+
+
         }
-        stream.drop()
-        return Expression.Literal(literal)
+        return
     }
 
     private fun parseFunctionDeclaration(
         stream: TokenStream,
         parentScope: Scope<String, Symbol>
-    ): Declaration.Function {
-        stream.save()
-
-        val scope = parentScope.new()
-
-        val returnType = scope.resolveType(stream.consume(), stream.tell() - 1)
-        val identifier = stream.expectNewIdentifier(scope)
+    ): Declaration.Function = runParsing(stream, parentScope.new()) {
+        val returnType = parentScope.resolveType(stream.consume(), stream.tell() - 1)
+        val identifier = stream.expectNewIdentifier(parentScope)
         stream.expect(Punctuation.LBracket)
         // TODO 解析参数列表
         stream.expect(Punctuation.RBracket)
 
-        val block = parseStatementsBlock(stream, scope)
-        stream.drop()
+        val block = parseStatementsBlock(stream, it)
 
         // TODO 考虑如何解决全限定名（后期希望考虑处理类方法、命名空间下的方法）
         return Declaration.Function(returnType, Qualifier(identifier.id), listOf(), block)

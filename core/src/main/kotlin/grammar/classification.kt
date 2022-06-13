@@ -150,7 +150,7 @@ private fun listProducers(iterator: Iterator<Token>, findLetter: (String) -> Let
     while (next != Punctuation.RCurlyBracket) {
 
         val left = buildList {
-            while (next != Operator.Greater) {
+            while (next != Operator.Gt) {
                 add(findLetter(next.toLetterExp()))
                 next = iterator.next()
             }
